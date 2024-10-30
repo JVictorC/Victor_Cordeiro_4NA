@@ -61,6 +61,32 @@ const createTransactionTable = async () => {
   }
 };
 
-createUsersTable().then(() => process.exit(0));
-createProductsTable().then(() => process.exit(0));
-createTransactionTable().then(() => process.exit(0));
+const alterTableUSer = async () => {
+  const client = await pool.connect();
+  try {
+    const queryText = `
+        ALTER TABLE users
+        ADD passwordHash VARCHAR(500) NOT NULL;
+    `;
+    await client.query(queryText);
+    console.log('Tabela "users" atualizada com successo!');
+  } catch (err) {
+    console.error("Erro ao criar tabela:", err);
+  } finally {
+    client.release();
+  }
+};
+
+const start = async () => {
+  await createUsersTable();
+  await createProductsTable();
+  await createTransactionTable();
+
+  await alterTableUSer();
+};
+
+start().then(() => process.exit(0));
+
+// DROP TABLE transactions;
+// DROp TABLE products;
+// DROp TABLE users;
